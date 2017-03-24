@@ -18,15 +18,15 @@ app.set('view engine', 'ejs');
 
 var passport=require("passport");
 var LocalStrategy = require("passport-local").Strategy;
-var FacebookStrategy = require("passport-Facebook").Strategy;
+var FacebookStrategy = require("passport-facebook").Strategy;
 var session = require("express-session");
 var bcrypt = require("bcrypt-nodejs");
 var usuarioModel=require("./models/usuarios");
 var User = require("./models/user");
 
 //mongoose
-var mongoose= require("mongoose");
-mongoose.Promise=global.Promise;
+var mongoose = require("mongoose");
+mongoose.Promise = global.Promise;
 mongoose.connect("mongodb://172.30.10.55:27017/Test");
 
 //configuracion passport
@@ -47,58 +47,48 @@ passport.use(new LocalStrategy(
        }
      }
    }
-
-  );
-         
+  );    
   }
 ));
 
 passport.use(
   new FacebookStrategy(
-
     {
-       clientID:'693999234058342',
-       clientSecret:'2b40abf6707313e7df2d098f0fba19ca',
-       callbackURL:"http://localhost:3000/users/auth/facebook/callback",
-       profileFields: ["emails","displayName"]
+      clientID: '1857260484532632',
+      clientSecret: 'f1a33247fd48b8fec9f74d7ad0a09dac',
+      callbackURL: "http://localhost:3000/users/auth/facebook/callback",
+      profileFields: ["email","displayName"]
     },
-    function(token,refreshToken,profile,done)
-    {
-      console.log(profile);
-      process.nextTick(
-        function(){
-          User.findOne(
-            {'facebook.id':profile.id},
-            function(err,user){
-              if(err){
-                return done(err);
-              }
-                if(user){
-                  return done(null,user);
-                }else{
-                  var newUser= new User();
-                  newUser.facebook.id= profile.id;
-                  newUser.facebook.token= token;
-                  newUser.facebook.name=profile.displayName;
-                  newUser.facebook.email= profile.id;
-                  newUser.save(
-                    function(err){
-                      if(err){
-                        throw err;
-                        return done(null,newUser);
-                      }
-                    }
-                  );
+    function(token, refreshToken, profile,done){
+      process.nextTick(function(){
+        User.findOne(
+          {'facebook.id':profile.id},
+          function(err,user){
+            if(err){
+              return done(err);
+            }
+            if(user){
+              return done(null,user);
+            }else{
+              var newUser = new User();
+              newUser.facebook.id = profile.id;
+              newUser.facebook.token = token;
+              newUser.facebook.name = profile.displayName;
+              newUser.facebook.email = profile.id;
+              newUser.save(function(err){
+                if(err){
+                    throw err;
                 }
-              }
-            
-          );
-        }
-      );
+                return done(null,newUser);
+              });
+            }
+          }
+        );
+      });
+      console.log(profile);
     }
   )
 );
-
 
 passport.serializeUser(
   function(usuario,done){
@@ -107,17 +97,10 @@ passport.serializeUser(
 );
 
 passport.deserializeUser(function(id,done){
-User.findById(id,function(err,user){
- done(err,user);
-});
+  User.findById(id,function(err,user){
+    done(err,user);
+  });
 },
-
-
-
-
-
-
-
    function(usuario,done){
     new usuarioModel.usuarios({usuario:usuario}).fetch().then(
      function(usuario){

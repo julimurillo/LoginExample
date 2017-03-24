@@ -1,7 +1,7 @@
 var conexion ={
     client:"mysql",
     connection: {
-        host:"172.30.10.55",
+        host:"172.30.10.119",
         user:"clase",
         password:"some_pass",
         database: "login_db",
